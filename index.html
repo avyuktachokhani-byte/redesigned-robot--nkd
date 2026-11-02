@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dark Chocolate Nutrition</title>
+<style>
+  :root {
+    --bg: #f6efe8;
+    --card: #fffaf5;
+    --ink: #2a1a12;
+    --muted: #7a6153;
+    --line: #2a1a12;
+    --soft: #e7d9cc;
+    --cocoa: #4a2617;
+    --fat: #8a4b2a;
+    --carb: #c9a27a;
+    --protein: #5e7d5a;
+    --accent: #b5562d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17100c; --card: #21160f; --ink: #f3e7dc; --muted: #b59c8b;
+      --line: #f3e7dc; --soft: #3a2a20; --cocoa: #e2b896;
+      --fat: #c97b4e; --carb: #e3c39d; --protein: #8fb388; --accent: #e38658;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; line-height: 1.45;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 16px 64px; }
+  header { margin-bottom: 28px; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: 12px; color: var(--accent); font-weight: 700; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(32px, 6vw, 52px); margin: 6px 0 8px; line-height: 1.05; color: var(--cocoa); }
+  header p { color: var(--muted); max-width: 620px; margin: 0; }
+
+  .control { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--soft); border-radius: 14px; padding: 14px 18px; margin: 24px 0; }
+  .control label { font-weight: 700; }
+  .control input[type=range] { flex: 1; min-width: 160px; accent-color: var(--accent); }
+  .grams { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 20px; min-width: 64px; }
+  .reset { border: 1px solid var(--soft); background: transparent; color: var(--ink); padding: 6px 12px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 14px; }
+  .reset:hover { border-color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px; align-items: start; }
+  @media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Nutrition facts label */
+  .label { background: #fff; color: #000; border: 2px solid #000; padding: 8px 10px; font-family: Helvetica, Arial, sans-serif; }
+  .label h2 { font-size: 38px; font-weight: 900; margin: 0; letter-spacing: -1px; line-height: 1; }
+  .label .serv { display: flex; justify-content: space-between; font-weight: 800; font-size: 17px; border-bottom: 10px solid #000; padding: 4px 0 4px; }
+  .label .small { font-size: 13px; font-weight: 700; }
+  .label .cal { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 5px solid #000; padding: 2px 0; }
+  .label .cal b:first-child { font-size: 26px; font-weight: 900; }
+  .label .cal b:last-child { font-size: 40px; font-weight: 900; line-height: 1; }
+  .label .dvh { text-align: right; font-size: 12px; font-weight: 800; border-bottom: 1px solid #000; padding: 3px 0; }
+  .row { display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding: 3px 0; font-size: 14px; }
+  .row.in1 { padding-left: 16px; }
+  .row.in2 { padding-left: 32px; }
+  .row.thick { border-bottom: 10px solid #000; }
+  .row b { font-weight: 800; }
+  .label .foot { font-size: 11px; padding-top: 5px; border-top: 5px solid #000; margin-top: -1px; }
+
+  .panel { background: var(--card); border: 1px solid var(--soft); border-radius: 18px; padding: 22px; margin-bottom: 24px; }
+  .panel h3 { margin: 0 0 4px; font-family: Georgia, serif; font-size: 22px; color: var(--cocoa); }
+  .panel .sub { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+  .macro { display: flex; gap: 26px; align-items: center; flex-wrap: wrap; }
+  .donut { width: 170px; height: 170px; border-radius: 50%; position: relative; flex: none; }
+  .donut::after { content: ""; position: absolute; inset: 30px; background: var(--card); border-radius: 50%; }
+  .donut span { position: absolute; inset: 0; display: grid; place-items: center; z-index: 1; text-align: center; font-weight: 800; font-size: 26px; line-height: 1.1; }
+  .donut small { display: block; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .legend { display: grid; gap: 10px; flex: 1; min-width: 200px; }
+  .leg { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center; }
+  .sw { width: 14px; height: 14px; border-radius: 4px; }
+  .leg .v { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .leg .p { color: var(--muted); font-size: 13px; }
+
+  .bars { display: grid; gap: 12px; }
+  .bar .top { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 4px; gap: 8px; }
+  .bar .top b { font-variant-numeric: tabular-nums; }
+  .track { height: 10px; background: var(--soft); border-radius: 999px; overflow: hidden; }
+  .fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width .3s; }
+  .fill.over { background: repeating-linear-gradient(45deg, var(--accent) 0 8px, var(--fat) 8px 16px); }
+
+  .chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .chip { border: 1px solid var(--soft); border-radius: 14px; padding: 14px; }
+  .chip .n { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--cocoa); }
+  .chip .t { font-size: 13px; color: var(--muted); }
+
+  .notes { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .notes p { margin: 6px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Nutrition breakdown</div>
+    <h1>Dark Chocolate, 40&nbsp;g</h1>
+    <p>Typical values for dark chocolate with 70–85% cacao solids — about four squares of a standard bar. Use the slider to see how the numbers change with portion size.</p>
+  </header>
+
+  <div class="control">
+    <label for="g">Portion</label>
+    <input type="range" id="g" min="10" max="100" step="5" value="40">
+    <span class="grams" id="gv">40 g</span>
+    <button class="reset" id="reset">Reset to 40 g</button>
+  </div>
+
+  <div class="grid">
+    <aside>
+      <div class="label" id="label"></div>
+    </aside>
+
+    <main>
+      <section class="panel">
+        <h3>Where the calories come from</h3>
+        <p class="sub">Energy share from fat, carbohydrate and protein.</p>
+        <div class="macro">
+          <div class="donut" id="donut"><span id="kcal"></span></div>
+          <div class="legend" id="legend"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Minerals &amp; vitamins</h3>
+        <p class="sub">Percent of Daily Value per portion (based on a 2,000-calorie diet). Striped bars exceed 50%.</p>
+        <div class="bars" id="bars"></div>
+      </section>
+
+      <section class="panel">
+        <h3>Natural stimulants</h3>
+        <p class="sub">Cocoa compounds that don't appear on a standard label.</p>
+        <div class="chips" id="chips"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="notes">
+    <p><strong>Source:</strong> USDA FoodData Central, “Chocolate, dark, 70–85% cacao solids” (FDC ID 170273), values per 100 g scaled to the selected portion. Daily Values follow the U.S. FDA reference amounts.</p>
+    <p>Brands vary — check your bar's label for exact figures, especially sugar and cacao percentage.</p>
+  </div>
+</div>
+
+<script>
+  // Per 100 g — USDA FDC 170273
+  const PER100 = {
+    kcal: 598, fat: 42.63, sat: 24.49, trans: 0.03, mono: 12.78, poly: 1.26,
+    chol: 3, sodium: 20, carb: 45.9, fiber: 10.9, sugar: 23.99, protein: 7.79,
+    potassium: 715, calcium: 73, iron: 11.9, magnesium: 228, phosphorus: 308,
+    zinc: 3.31, copper: 1.77, manganese: 1.95, selenium: 6.8, vitk: 7.3,
+    caffeine: 80, theobromine: 802
+  };
+  // FDA Daily Values
+  const DV = {
+    fat: 78, sat: 20, chol: 300, sodium: 2300, carb: 275, fiber: 28, protein: 50,
+    potassium: 4700, calcium: 1300, iron: 18, magnesium: 420, phosphorus: 1250,
+    zinc: 11, copper: 0.9, manganese: 2.3, selenium: 55, vitk: 120
+  };
+  const MICROS = [
+    ["copper", "Copper", "mg", 2],
+    ["manganese", "Manganese", "mg", 2],
+    ["iron", "Iron", "mg", 1],
+    ["magnesium", "Magnesium", "mg", 0],
+    ["zinc", "Zinc", "mg", 1],
+    ["phosphorus", "Phosphorus", "mg", 0],
+    ["potassium", "Potassium", "mg", 0],
+    ["selenium", "Selenium", "µg", 1],
+    ["calcium", "Calcium", "mg", 0],
+    ["vitk", "Vitamin K", "µg", 1]
+  ];
+
+  const $ = id => document.getElementById(id);
+  const fmt = (v, d) => {
+    const n = Number(v.toFixed(d));
+    return n.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
+  };
+  const pct = (k, v) => Math.round(v / DV[k] * 100);
+
+  function render(g) {
+    const f = g / 100;
+    const n = {};
+    for (const k in PER100) n[k] = PER100[k] * f;
+
+    $("gv").textContent = g + " g";
+
+    // Label
+    const r = (cls, name, val, unit, d, dvKey) =>
+      `<div class="row ${cls}"><span>${name} ${fmt(val, d)}${unit}</span><b>${dvKey ? pct(dvKey, val) + "%" : ""}</b></div>`;
+    $("label").innerHTML = `
+      <h2>Nutrition Facts</h2>
+      <div class="small" style="border-bottom:1px solid #000;padding:3px 0">Dark chocolate, 70–85% cacao</div>
+      <div class="serv"><span>Serving size</span><span>${g} g</span></div>
+      <div class="small" style="padding-top:2px">Amount per serving</div>
+      <div class="cal"><b>Calories</b><b>${Math.round(n.kcal)}</b></div>
+      <div class="dvh">% Daily Value*</div>
+      ${r("", "<b>Total Fat</b>", n.fat, "g", 1, "fat")}
+      ${r("in1", "Saturated Fat", n.sat, "g", 1, "sat")}
+      ${r("in1", "<i>Trans</i> Fat", n.trans, "g", 2)}
+      ${r("in1", "Monounsaturated Fat", n.mono, "g", 1)}
+      ${r("in1", "Polyunsaturated Fat", n.poly, "g", 1)}
+      ${r("", "<b>Cholesterol</b>", n.chol, "mg", 0, "chol")}
+      ${r("", "<b>Sodium</b>", n.sodium, "mg", 0, "sodium")}
+      ${r("", "<b>Total Carbohydrate</b>", n.carb, "g", 1, "carb")}
+      ${r("in1", "Dietary Fiber", n.fiber, "g", 1, "fiber")}
+      ${r("in1", "Total Sugars", n.sugar, "g", 1)}
+      ${r("thick", "<b>Protein</b>", n.protein, "g", 1, "protein")}
+      ${r("", "Iron", n.iron, "mg", 1, "iron")}
+      ${r("", "Magnesium", n.magnesium, "mg", 0, "magnesium")}
+      ${r("", "Potassium", n.potassium, "mg", 0, "potassium")}
+      ${r("", "Calcium", n.calcium, "mg", 0, "calcium")}
+      ${r("", "Copper", n.copper, "mg", 2, "copper")}
+      ${r("", "Manganese", n.manganese, "mg", 2, "manganese")}
+      ${r("", "Zinc", n.zinc, "mg", 1, "zinc")}
+      <div class="foot">* The % Daily Value tells you how much a nutrient in a serving of food contributes to a daily diet. 2,000 calories a day is used for general nutrition advice.</div>`;
+
+    // Macro donut
+    const kF = n.fat * 9, kC = n.carb * 4, kP = n.protein * 4, tot = kF + kC + kP;
+    const pF = kF / tot * 100, pC = kC / tot * 100;
+    const cs = getComputedStyle(document.documentElement);
+    const cF = cs.getPropertyValue("--fat").trim(), cC = cs.getPropertyValue("--carb").trim(), cP = cs.getPropertyValue("--protein").trim();
+    $("donut").style.background = `conic-gradient(${cF} 0 ${pF}%, ${cC} ${pF}% ${pF + pC}%, ${cP} ${pF + pC}% 100%)`;
+    $("kcal").innerHTML = `<div>${Math.round(n.kcal)}<small>kcal</small></div>`;
+    const leg = (c, name, grams, kc) =>
+      `<div class="leg"><span class="sw" style="background:${c}"></span><span>${name} <span class="p">· ${Math.round(kc / tot * 100)}% of calories</span></span><span class="v">${fmt(grams, 1)} g</span></div>`;
+    $("legend").innerHTML =
+      leg(cF, "Fat", n.fat, kF) + leg(cC, "Carbohydrate", n.carb, kC) + leg(cP, "Protein", n.protein, kP) +
+      `<div class="leg"><span class="sw" style="background:transparent;border:1px dashed currentColor"></span><span>of which fiber</span><span class="v">${fmt(n.fiber, 1)} g</span></div>` +
+      `<div class="leg"><span class="sw" style="background:transparent;border:1px dashed currentColor"></span><span>of which sugars</span><span class="v">${fmt(n.sugar, 1)} g</span></div>`;
+
+    // Micro bars
+    $("bars").innerHTML = MICROS.map(([k, name, unit, d]) => {
+      const p = pct(k, n[k]);
+      return `<div class="bar"><div class="top"><span>${name} · ${fmt(n[k], d)} ${unit}</span><b>${p}%</b></div>
+        <div class="track"><div class="fill ${p > 50 ? "over" : ""}" style="width:${Math.min(p, 100)}%"></div></div></div>`;
+    }).join("");
+
+    // Stimulants
+    $("chips").innerHTML = `
+      <div class="chip"><div class="n">${Math.round(n.caffeine)} mg</div><div class="t">Caffeine — roughly a third of a cup of brewed coffee</div></div>
+      <div class="chip"><div class="n">${Math.round(n.theobromine)} mg</div><div class="t">Theobromine — cocoa's milder, longer-lasting stimulant</div></div>`;
+  }
+
+  const slider = $("g");
+  slider.addEventListener("input", () => render(+slider.value));
+  $("reset").addEventListener("click", () => { slider.value = 40; render(40); });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => render(+slider.value));
+  render(40);
+</script>
+</body>
+</html>
